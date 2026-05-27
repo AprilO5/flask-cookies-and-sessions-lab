@@ -1,4 +1,21 @@
-# Cookies and Sessions Lab
+# Cookies and Sessions Paywall Lab
+
+This Flask and React lab demonstrates how server-side session data can enforce a
+simple blog paywall. The API tracks article views in the Flask `session` object,
+allows each browser session to view three articles, and returns a paywall
+response once the limit is reached.
+
+![Completed paywall lab](screenshots/paywall-lab.png)
+
+## Features
+
+- Lists seeded blog articles through the `/articles` API endpoint.
+- Shows individual article data from `/articles/<id>`.
+- Stores page view counts in a signed Flask session cookie.
+- Allows three article views per session.
+- Returns `{"message": "Maximum pageview limit reached"}` with a `401` status
+  code after the third view.
+- Resets the session count with `/clear`.
 
 ## Scenario
 
@@ -47,6 +64,39 @@ Proxy error: Could not proxy request /articles from localhost:4000 to http://loc
 
 That's okay, that just means our Flask API isn't yet running, but the frontend is 
 trying to make a request.
+
+## API Behavior
+
+### `GET /articles`
+
+Returns all article previews.
+
+### `GET /articles/<id>`
+
+Initializes `session['page_views']` when needed, increments it on each article
+request, and returns the selected article while the session has viewed three or
+fewer pages. Once the count is greater than three, the route returns:
+
+```json
+{
+  "message": "Maximum pageview limit reached"
+}
+```
+
+with a `401 Unauthorized` status code.
+
+### `GET /clear`
+
+Resets `session['page_views']` to `0` so the current browser session can view
+articles again.
+
+## Testing
+
+Run the backend tests from the project root:
+
+```bash
+pytest
+```
 
 ## Instructions
 
